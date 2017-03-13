@@ -7,6 +7,7 @@ let listUsersHandler;
 const startRoom = (e, socket, user, room) => {
   document.querySelector('#btnAction').disabled = false;
   socket.emit('start', { roomname: room });
+  socket.emit('listUsers', { name: user, roomname: room });
 };
 
 const sendAction = (e, socket, user, room, action) => {
@@ -55,14 +56,15 @@ const connectSocket = (e) => {
     console.log('Server says action confirmed: ' + data.confirm);
     // Disable turn controls
     if (data.confirm) {
-      action.disabled = true;
+      document.querySelector('#btnAction').disabled = false;
     }
   });
 
   socket.on('turnCount', (data) => {
     // Allow new action
     log.innerHTML += `It is now turn ${data.turnNum}\n`;
-    action.disabled = false;
+    document.querySelector('#btnAction').disabled = false;
+    socket.emit('listUsers', { name: user, roomname: room });
   });
 
   socket.on('acquittalCount', (data) => {
@@ -73,8 +75,20 @@ const connectSocket = (e) => {
 
   });
 
-  socket.on('playerList', () => {
+  socket.on('playerList', (data) => {
     // List current game players
+
+    // Probably a more efficient way of doing this. . .
+    const target = document.querySelector('#target');
+    for (let i = 0; i < target.length; i++) {
+      target.remove(i); // Remove old user list
+    }
+
+    for (let j = 0; j < data.list.length; j++) {
+      const opt = document.createElement("option");
+      opt.text = data.list[j];
+      target.add(opt);
+    }
   });
 
   socket.on('gameStarted', () => {
@@ -82,7 +96,9 @@ const connectSocket = (e) => {
   });
 
   startHandler = () => startRoom(e, socket, user, room);
-  document.querySelector('#btnStart').addEventListener('click', startHandler);
+  const start = document.querySelector('#btnStart');
+  start.addEventListener('click', startHandler);
+  start.disabled = false;
 
   actionHandler = () => sendAction(e, socket, user, room, action);
   document.querySelector('#btnAction').addEventListener('click', actionHandler);
