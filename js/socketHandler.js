@@ -56,7 +56,7 @@ const connectSocket = (e) => {
     console.log('Server says action confirmed: ' + data.confirm);
     // Disable turn controls
     if (data.confirm) {
-      document.querySelector('#btnAction').disabled = false;
+      document.querySelector('#btnAction').disabled = true;
     }
   });
 
