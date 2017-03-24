@@ -5,6 +5,7 @@
   "main": "./js/wpentry.js",
   "scripts": {
     "webpack": "webpack",
+    "webpacklive": "webpack --watch",
     "pretest": "eslint ./js --fix",
     "test": "echo \"Tests complete\""
   },
