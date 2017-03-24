@@ -17,6 +17,17 @@ button, input, select {
     }
 }
 
+@keyframes fadeInSlide {
+    from {
+        top: 9999px;
+        opacity: 0;
+    }
+    to {
+        top: 0px;
+        opacity: 1;
+    }
+}
+
 #joinGame, #createRoom {
     background-color: #262626;
     width: 100%;
@@ -42,7 +53,7 @@ button, input, select {
     margin-top: 50px;
     border: 1px solid transparent;
     border-radius: 4px;
-    animation-duration: 3s;
+    animation-duration: 1s;
     animation-fill-mode: forwards;
     animation-name: fadeIn;
 }
@@ -51,7 +62,7 @@ button, input, select {
     border: 1px solid skyblue;
 }
 
-#joinGame input[type="submit"], #CreateGame input[type="submit"] {
+#joinGame input[type="submit"], #createRoom input[type="submit"] {
     opacity: 0;
     border: 0px solid #484848;
     background-color: #484848;
@@ -62,19 +73,19 @@ button, input, select {
     margin: auto;
     margin-top: 70px;
     border-radius: 4px;
-    animation-duration: 3s;
+    animation-duration: 1s;
     animation-fill-mode: forwards;
-    animation-delay: 1s;
+    animation-delay: 0s;
     animation-name: fadeIn;
 }
 
-#joinGame input[type="submit"]:hover, #createGame input[type="submit"]:hover {
+#joinGame input[type="submit"]:hover, #createRoom input[type="submit"]:hover {
     background-color: #686868;
     color: #DEDEDE;
     cursor: pointer;
 }
 
-#joinGameWrapper, #createGameWrapper {
+#joinGameWrapper, #createRoomWrapper {
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -82,24 +93,146 @@ button, input, select {
     top: 0;
     left: 0;
     display: none;
+    z-index: 1;
 }
 
 #gameWrapper {
-    width: 100%;
+    /*width: 100%;
     height: 100%;
     overflow: hidden;
     position: fixed;
     top: 0;
     left: 0;
-    display: block;
+    display: block;*/
+    overflow: auto;
+    z-index: 0;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+}
+
+#roomControls {
+    float: left;
+    /*display:block;*/
+    width: 25%;
+    height: 700px;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+    background-color: #353535;
+    padding-top: 10px;
+}
+
+span {
+    margin: 10px;
 }
 
 #roomList {
-    float: right;
-    width: 400px;
-    height: 800px;
+    height: 500px;
+    margin: 10px 10px 10px 10px;
+    list-style-type: none;
+    padding-left:0;
+}
+
+.roomAnchor {
+    width: 100%;
+    cursor: pointer;
+    margin: 3px;
+    display: inline-block;
+}
+
+.roomListItem {
+    opacity: 0;
+    border: 0px solid #484848;
+    background-color: #484848;
+    color: #DDDDDD;
+    width: 90%;
+    border-radius: 1px;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-delay: 0s;
+    animation-name: fadeIn;
+    text-align: center;
+    margin: auto;
+    margin-top: 10px;
+}
+
+.roomListItem:hover {
+    border: 0px solid #585858;
+    background-color: #585858;
+}
+
+#btnNewRoom {
+    display: block;
+    margin: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+    height: 30px;
+    border: 0px solid #484848;
+    background-color: #484848;
+    color: #DDDDDD;
+}
+
+#btnNewRoom:hover {
+    border: 0px solid #585858;
+    background-color: #585858;
+    cursor: pointer;
 }
 
 #gameControls {
-    float: right;
+    float: left;
+    margin-left: 20px;
+    width: 70%;
+    height: 700px;
+    padding-top: 10px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    background-color: #353535;
+    /*display:inline-block;*/
+}
+
+#btnStart {
+    display: block;
+    margin: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 170px;
+    height: 30px;
+    border: 0px solid #484848;
+    background-color: #484848;
+    color: #DDDDDD;
+    cursor: pointer;
+}
+
+#btnStart:hover:enabled {
+    border: 0px solid #585858;
+    background-color: #585858;
+}
+
+#statDisplay, #actionControls, #log {
+    margin-left: 10px;
+}
+
+#statDisplay {
+    margin-top: 10px;
+}
+
+.statbox {
+    width: 30px;
+    border: 0px solid #484848;
+    background-color: #484848;
+    color: #DDDDDD;
+    text-align: center;
+}
+
+#btnAction {
+    border: 0px solid #484848;
+    background-color: #484848;
+    color: #DDDDDD;
+    height: 27px;
+}
+
+#btnAction:hover:enabled {
+    border: 0px solid #585858;
+    background-color: #585858;
 }

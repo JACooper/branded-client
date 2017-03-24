@@ -9,7 +9,12 @@ let user, room; // Ugly, but
 
 const displayRoomInfo = (e) => {
   const joinGameDialogue = document.querySelector('#joinGameWrapper');
-  joinGameDialogue.display = "block";
+  joinGameDialogue.style.display = "block";
+
+  const joinRoomname = document.querySelector('#room');
+  joinRoomname.value = e.target.innerHTML;
+
+  document.querySelector('#user').focus();
 };
 
 //  --  --  --  onReceive methods --  --  --
@@ -17,13 +22,19 @@ const displayRoomInfo = (e) => {
 const onRoomCreated = (data) => {
   const createRoomDialogue = document.querySelector('#createRoomWrapper');
   createRoomDialogue.style.display = "none";
+  document.querySelector('#roomname').value = '';
 };
 
-const onJoined = (data) => {
+const onJoined = (socket, data) => {
   const joinDialogue = document.querySelector('#joinGameWrapper');
   joinDialogue.style.display = "none";
-  document.querySelector('#btnAction').disabled = false;
-  socket.emit('list-users', { name: user, roomname: room });
+  if (data.joined) {
+    document.querySelector('#btnAction').disabled = false;
+    socket.emit('list-users', { name: user, roomname: room });
+  } else {
+    const log = document.querySelector('#log');
+    log.innerHTML += "Could not join room.\n";
+  }
 };
 
 const onConfirm = (data) => {
@@ -31,13 +42,18 @@ const onConfirm = (data) => {
   // Disable turn controls
   if (data.confirm) {
     document.querySelector('#btnAction').disabled = true;
+  } else {
+    const log = document.querySelector('#log');
+    log.innerHTML += "Invalid action!\n";
   }
 };
 
-const onTurnCount = (data) => {
+const onTurnCount = (socket, data) => {
   // Allow new action
-  log.innerHTML += `It is now turn ${data.turnNum}\n`;
   document.querySelector('#btnAction').disabled = false;
+  document.querySelector('#btnStart').disabled = true;
+
+  log.innerHTML += `It is now turn ${data.turnNum}\n`;
   socket.emit('list-users', { name: user, roomname: room });
 };
 
@@ -49,11 +65,11 @@ const onStats = (data) => {
   const acquittal = document.querySelector('#acquittal');
   const persuation = document.querySelector('#persuasion');
 
-  guilt.innerHTML = `${data.guilt}/${data.maxGuilt}`;
-  innocence.innerHTML = `${data.innocence}`
-  status.innerHTML = `${data.status}`
-  acquittal.innerHTML = `${data.acquittal}`
-  persuasion.innerHTML = `${data.persuasion}`
+  guilt.value = `${data.guilt}/${data.maxGuilt}`;
+  innocence.value = `${data.innocence}`
+  status.value = `${data.status}`
+  acquittal.value = `${data.acquittal}`
+  persuasion.value = `${data.persuasion}`
 };
 
 const onRoomList = (data) => {
@@ -68,7 +84,7 @@ const onRoomList = (data) => {
     const listItem = document.createElement('li');
     const anchor = document.createElement('a');
     anchor.addEventListener('click', displayRoomInfo);
-    anchor.innerHTML = _room;
+    anchor.innerHTML = _room.roomname;
     anchor.className = 'roomAnchor';
     listItem.className = 'roomListItem';
     listItem.appendChild(anchor);
@@ -81,7 +97,7 @@ const onPlayerList = (data) => {
 
   // Probably a more efficient way of doing this. . .
   const target = document.querySelector('#target');
-  for (let i = 0; i < target.length; i++) {
+  for (let i = target.length - 1; i >= 0; i--) {
     target.remove(i); // Remove old user list
   }
 
@@ -92,9 +108,21 @@ const onPlayerList = (data) => {
   }
 };
 
+const onResults = (data) => {
+  const users = data.users;
+  users.forEach((_user) => {
+    let state = "won";
+    if (_user.lost) {
+      state = "lost";
+    }
+
+    log.innerHTML += `${_user.name}, who was a ${_user.role}, ${state}`;
+  });
+};
+
 //  --  --  --  Send methods  --  --  --
 
-const createRoom = (socket, room) => {
+const createRoom = (socket) => {
   const newRoom = document.querySelector('#roomname').value;
 
   document.querySelector('#btnCreate').disabled = true;
@@ -105,11 +133,11 @@ const joinRoom = (e, socket) => {
   const roomname = document.querySelector('#room').value;
   const username = document.querySelector('#user').value;
 
-  if (roomname && username) {
+  if (roomname !== '' && username !== '') {
     room = roomname;
     user = username;
 
-    socket.emit('join', { roomname: room });
+    socket.emit('join', { roomname: room, name: user });
   }
 
   e.preventDefault();
@@ -118,7 +146,7 @@ const joinRoom = (e, socket) => {
   return false;
 };
 
-const startGame = (socket) => {
+const startGame = (e, socket) => {
   document.querySelector('#btnAction').disabled = false;
   socket.emit('start', { roomname: room });
   socket.emit('list-users', { name: user, roomname: room });
@@ -159,16 +187,13 @@ const connectSocket = (e) => {
   });
 
   socket.on('room-created', onRoomCreated);
-  socket.on('joined', onJoined);
+  socket.on('joined', (data) => { onJoined(socket, data); });
   socket.on('confirm', onConfirm);
-  socket.on('turn-count', onTurnCount);
+  socket.on('turn-count', (data) => { onTurnCount(socket, data); });
   socket.on('stats', onStats);
   socket.on('room-list', onRoomList);
   socket.on('player-list', onPlayerList);
-
-  socket.on('results', (data) => {
-
-  });
+  socket.on('results', onResults);
 
   startHandler = (e) => startGame(e, socket);
   const start = document.querySelector('#btnStart');
@@ -177,12 +202,16 @@ const connectSocket = (e) => {
 
   joinHandler = (e) => joinRoom(e, socket);
   const join = document.querySelector('#btnJoin');
-  join.addEventListener('submit', joinHandler);
+  join.addEventListener('click', joinHandler);
 
   actionHandler = (e) => sendAction(e, socket, action);
   document.querySelector('#btnAction').addEventListener('click', actionHandler);
 
   listUsersHandler = (e) => listUsers(e, socket);
+
+  document.querySelector('#btnCreate').addEventListener('click', (e) => {
+    createRoom(socket);
+  });
 };
 
 module.exports.connectSocket = connectSocket;

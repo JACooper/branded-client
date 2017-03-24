@@ -12,7 +12,7 @@ const toggleTarget = (e) => {
 
 const allowCreation = (e) => {
   const roomname = document.querySelector('#roomname').value;
-  const buttonCreate = document.querySelector('btnCreate');
+  const buttonCreate = document.querySelector('#btnCreate');
 
   if (roomname !== '') {
     buttonCreate.disabled = false;
@@ -22,8 +22,8 @@ const allowCreation = (e) => {
 };
 
 const allowJoin = (e) => {
-  const username = document.querySelector('#username').value;
-  const buttonJoin = document.querySelector('btnJoin');
+  const username = document.querySelector('#user').value;
+  const buttonJoin = document.querySelector('#btnJoin');
   
   if (username !== '') {
     buttonJoin.disabled = false;
@@ -34,7 +34,9 @@ const allowJoin = (e) => {
 
 const showCreateScreen = (e) => {
   const createRoomDialogue = document.querySelector('#createRoomWrapper');
-  createRoomDialogue.display = "block";
+  createRoomDialogue.style.display = "block";
+
+  document.querySelector('#roomname').focus();
 };
 
 const init = () => {
@@ -43,7 +45,7 @@ const init = () => {
   const createRoomName = document.querySelector('#roomname');
   createRoomName.addEventListener('change', allowCreation);
 
-  const joinUserName = document.querySelector('#username');
+  const joinUserName = document.querySelector('#user');
   joinUserName.addEventListener('change', allowJoin);
 
   const createRoom = document.querySelector('#btnNewRoom');
