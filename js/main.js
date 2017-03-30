@@ -39,6 +39,16 @@ const showCreateScreen = (e) => {
   document.querySelector('#roomname').focus();
 };
 
+const showRules = (e) => {
+  const rulesDiv = document.querySelector('#rulesWrapper');
+  rulesDiv.style.display = "block";
+};
+
+const closeRules = (e) => {
+  const rulesDiv = document.querySelector('#rulesWrapper');
+  rulesDiv.style.display = "none";
+};
+
 const init = () => {
   socketHandler.connectSocket();
 
@@ -53,6 +63,12 @@ const init = () => {
 
   const action = document.querySelector('#action');
   action.addEventListener('change', toggleTarget);
+
+  const rules = document.querySelector('#btnRules');
+  rules.addEventListener('click', showRules);
+
+  const closeRulesBtn = document.querySelector('#btnCloseRules');
+  closeRulesBtn.addEventListener('click', closeRules);
 };
 
 window.onload = init;
